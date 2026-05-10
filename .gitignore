@@ -27,10 +27,7 @@ env/
 .streamlit/secrets.toml
 
 # data files
-data/raw/*
-data/processed/*
-data/chunks/*
-data/eval/*
+data/
 
 !data/raw/.gitkeep
 !data/processed/.gitkeep
