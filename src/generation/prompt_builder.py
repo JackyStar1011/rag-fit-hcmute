@@ -24,14 +24,14 @@ def build_context(
         text = truncate_text(chunk.get("text", ""), max_chars=max_chars_per_chunk)
 
         block = f"""
-[source_{i}]
-title: {title}
-category: {category}
-score: {score:.4f}
-url: {url}
-content:
-{text}
-""".strip()
+        [{i}]
+        title: {title}
+        category: {category}
+        score: {score:.4f}
+        url: {url}
+        content:
+        {text}
+        """.strip()
 
         context_blocks.append(block)
 
@@ -57,12 +57,12 @@ Quy tắc bắt buộc:
 3. Không tự suy đoán, không bịa ngày tháng, mã ngành, điểm chuẩn, học phí, chương trình đào tạo, tên sự kiện hoặc thông tin liên hệ.
 4. Nếu có context không liên quan đến câu hỏi, hãy bỏ qua context đó.
 5. Mọi câu trả lời có thông tin thực tế bắt buộc phải có citation ở cuối câu.
-6. Citation phải dùng đúng định dạng [source_1], [source_2], [source_3].
+6. Citation phải dùng đúng định dạng [1], [2], [3].
 7. Không được trả lời nếu không có citation.
 8. Trả lời bằng tiếng Việt, ngắn gọn, rõ ý.
 
 Ví dụ định dạng trả lời đúng:
-Khoa Công nghệ Thông tin HCMUTE được thành lập năm 2001. [source_3]
+Khoa Công nghệ Thông tin HCMUTE được thành lập năm 2001. [3]
 
 Câu hỏi:
 {question}
