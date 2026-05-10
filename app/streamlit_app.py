@@ -8,7 +8,11 @@ sys.path.append(str(ROOT_DIR))
 
 from src.generation.prompt_builder import build_rag_prompt
 from src.retrieval.dense_retriever import DenseRetriever
+from src.generation.llm_generator import LocalLLMGenerator
 
+@st.cache_resource
+def load_generator():
+    return LocalLLMGenerator()
 
 st.set_page_config(
     page_title="FIT HCMUTE RAG Assistant",
@@ -61,10 +65,11 @@ if st.button("Ask") and question:
 
         st.subheader("Answer")
 
-        st.info(
-            "Current version validates retrieval and prompt construction. "
-            "LLM generation will be connected in the next step."
-        )
+        with st.spinner("Generating answer..."):
+            generator = load_generator()
+            answer = generator.generate(prompt)
+
+        st.write(answer)
 
     except FileNotFoundError as error:
         st.error(str(error))
