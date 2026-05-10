@@ -12,7 +12,7 @@ def truncate_text(text: str, max_chars: int = 1200) -> str:
 
 def build_context(
     retrieved_chunks: list[dict[str, Any]],
-    max_chars_per_chunk: int = 1200,
+    max_chars_per_chunk: int = 800,
 ) -> str:
     context_blocks = []
 
