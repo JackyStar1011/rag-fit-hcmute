@@ -12,7 +12,7 @@ def truncate_text(text: str, max_chars: int = 1200) -> str:
 
 def build_context(
     retrieved_chunks: list[dict[str, Any]],
-    max_chars_per_chunk: int = 1200,
+    max_chars_per_chunk: int = 800,
 ) -> str:
     context_blocks = []
 
@@ -24,14 +24,14 @@ def build_context(
         text = truncate_text(chunk.get("text", ""), max_chars=max_chars_per_chunk)
 
         block = f"""
-[source_{i}]
-title: {title}
-category: {category}
-score: {score:.4f}
-url: {url}
-content:
-{text}
-""".strip()
+        [{i}]
+        title: {title}
+        category: {category}
+        score: {score:.4f}
+        url: {url}
+        content:
+        {text}
+        """.strip()
 
         context_blocks.append(block)
 
@@ -52,13 +52,17 @@ Trả lời câu hỏi của người dùng dựa trên các context được cu
 
 Quy tắc bắt buộc:
 1. Chỉ sử dụng thông tin xuất hiện trong context.
-2. Nếu context không đủ thông tin để trả lời, hãy nói:
+2. Nếu context không đủ thông tin để trả lời, hãy trả lời đúng câu sau:
    "Tôi chưa có đủ thông tin trong tài liệu được cung cấp để trả lời câu hỏi này."
 3. Không tự suy đoán, không bịa ngày tháng, mã ngành, điểm chuẩn, học phí, chương trình đào tạo, tên sự kiện hoặc thông tin liên hệ.
 4. Nếu có context không liên quan đến câu hỏi, hãy bỏ qua context đó.
-5. Mỗi thông tin quan trọng phải có citation theo dạng [source_1], [source_2].
-6. Trả lời bằng tiếng Việt, ngắn gọn, rõ ý.
-7. Không liệt kê toàn bộ context. Chỉ tổng hợp phần liên quan đến câu hỏi.
+5. Mọi câu trả lời có thông tin thực tế bắt buộc phải có citation ở cuối câu.
+6. Citation phải dùng đúng định dạng [1], [2], [3].
+7. Không được trả lời nếu không có citation.
+8. Trả lời bằng tiếng Việt, ngắn gọn, rõ ý.
+
+Ví dụ định dạng trả lời đúng:
+Khoa Công nghệ Thông tin HCMUTE được thành lập năm 2001. [3]
 
 Câu hỏi:
 {question}
@@ -66,7 +70,7 @@ Câu hỏi:
 Context:
 {context}
 
-Câu trả lời:
+Hãy trả lời theo đúng định dạng, bắt buộc có citation:
 """.strip()
 
     return prompt

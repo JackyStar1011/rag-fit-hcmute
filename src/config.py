@@ -1,4 +1,5 @@
 from pathlib import Path
+import os
 
 ROOT_DIR = Path(__file__).resolve().parents[1]
 
@@ -11,3 +12,11 @@ FAISS_INDEX_PATH = INDEX_DIR / "faiss.index"
 METADATA_PATH = INDEX_DIR / "metadata.pkl"
 
 EMBEDDING_MODEL_NAME = "AITeamVN/Vietnamese_Embedding"
+
+# generator model for RAG answer generation
+GENERATOR_MODEL_NAME = os.getenv(
+    "GENERATOR_MODEL_NAME",
+    "Qwen/Qwen2.5-0.5B-Instruct",
+)
+
+MAX_NEW_TOKENS = int(os.getenv("MAX_NEW_TOKENS", "220"))
