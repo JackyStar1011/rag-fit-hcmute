@@ -1,0 +1,66 @@
+# python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# virtual environment
+.venv/
+venv/
+env/
+
+# environment variables
+.env
+.env.*
+
+# notebooks
+.ipynb_checkpoints/
+
+# cache
+.cache/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# streamlit
+.streamlit/secrets.toml
+
+# data files
+data/raw/*
+data/processed/*
+data/chunks/*
+data/eval/*
+
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/chunks/.gitkeep
+!data/eval/.gitkeep
+
+# indexes and model artifacts
+indexes/*
+models/*
+
+!indexes/.gitkeep
+!models/.gitkeep
+
+# large files
+*.faiss
+*.index
+*.pkl
+*.pickle
+*.bin
+*.pt
+*.pth
+*.safetensors
+*.onnx
+
+# logs
+logs/
+*.log
+
+# os/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
