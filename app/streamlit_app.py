@@ -10,6 +10,7 @@ sys.path.append(str(ROOT_DIR))
 from src.generation.llm_generator import LocalLLMGenerator
 from src.generation.prompt_builder import build_rag_prompt
 from src.retrieval.dense_retriever import DenseRetriever
+from src.generation.citation_validator import validate_or_fallback
 
 
 st.set_page_config(
@@ -160,6 +161,7 @@ if ask_clicked and question:
 
             processing_logs.append("Generated final answer.")
             answer = generator.generate(prompt)
+            answer = validate_or_fallback(answer,max_source_id=len(results))
 
         st.markdown(answer)
         render_answer_sources(answer, results)
