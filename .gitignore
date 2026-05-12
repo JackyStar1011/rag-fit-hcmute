@@ -26,9 +26,6 @@ env/
 # streamlit
 .streamlit/secrets.toml
 
-# data files
-data/
-
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/chunks/.gitkeep
