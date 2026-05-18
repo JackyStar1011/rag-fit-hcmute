@@ -1,32 +1,29 @@
 import pickle
+import re
 
-import faiss
 import numpy as np
-from sentence_transformers import SentenceTransformer
+from rank_bm25 import BM25Okapi
 
-from src.config import (
-    FAISS_INDEX_PATH,
-    METADATA_PATH,
-    EMBEDDING_MODEL_NAME,
-)
+from src.config import METADATA_PATH
 
 
-class DenseRetriever:
+class BM25Retriever:
     def __init__(self):
-        print("Loading embedding model...")
-        self.model = SentenceTransformer(
-            EMBEDDING_MODEL_NAME,
-            device="cpu"
-        )
+        print("Loading metadata for BM25...")
 
-        print("Loading FAISS index...")
-        self.index = faiss.read_index(str(FAISS_INDEX_PATH))
-
-        print("Loading metadata...")
         with open(METADATA_PATH, "rb") as f:
             self.metadata = pickle.load(f)
 
-        print("Retriever ready!")
+        print(f"Loaded {len(self.metadata)} chunks")
+
+        self.corpus_tokens = [
+            self.tokenize(item["text"]) for item in self.metadata
+        ]
+
+        print("Building BM25 index...")
+        self.bm25 = BM25Okapi(self.corpus_tokens)
+
+        print("BM25 retriever ready!")
 
     def normalize_query(self, query: str) -> str:
         replacements = {
@@ -44,35 +41,39 @@ class DenseRetriever:
 
         return normalized
 
-    def search(self, query, top_k=5):
+    def tokenize(self, text: str) -> list[str]:
+        text = text.lower()
+        return re.findall(r"\w+", text, flags=re.UNICODE)
+
+    def search(self, query: str, top_k: int = 5):
         normalized_query = self.normalize_query(query)
+        query_tokens = self.tokenize(normalized_query)
 
-        query_embedding = self.model.encode(
-            [normalized_query],
-            normalize_embeddings=True,
-        )
+        scores = self.bm25.get_scores(query_tokens)
 
-        query_embedding = np.asarray(query_embedding, dtype="float32")
-
-        # search deeper để đủ chỗ sau dedupe
-        scores, ids = self.index.search(query_embedding, top_k * 3)
+        # lấy nhiều hơn top_k để còn dedupe
+        candidate_count = min(top_k * 5, len(scores))
+        top_indices = np.argsort(scores)[::-1][:candidate_count]
 
         results = []
         seen_doc_ids = set()
 
-        for score, idx in zip(scores[0], ids[0]):
-            if idx == -1:
+        for idx in top_indices:
+            score = float(scores[idx])
+
+            if score <= 0:
                 continue
 
             item = self.metadata[int(idx)].copy()
 
-            # dedupe theo doc_id
+            # dedupe theo source document
             if item["doc_id"] in seen_doc_ids:
                 continue
 
             seen_doc_ids.add(item["doc_id"])
 
-            item["score"] = float(score)
+            item["score"] = score
+            item["retriever"] = "bm25"
             results.append(item)
 
             if len(results) >= top_k:
@@ -82,7 +83,7 @@ class DenseRetriever:
 
 
 if __name__ == "__main__":
-    retriever = DenseRetriever()
+    retriever = BM25Retriever()
 
     test_queries = [
         "Khoa CNTT HCMUTE thành lập năm nào?",
