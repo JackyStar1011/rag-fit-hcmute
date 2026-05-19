@@ -1,0 +1,126 @@
+{
+  "input_path": "data\\chunks_clean.jsonl",
+  "output_dir": "data\\processed",
+  "total_input_lines": 1143,
+  "valid_json_lines": 1143,
+  "kept_chunks": 723,
+  "core_chunks": 316,
+  "news_chunks": 70,
+  "general_chunks": 337,
+  "dropped_noise": 160,
+  "dropped_duplicates": 260,
+  "invalid_json_lines": 0,
+  "category_distribution": {
+    "news_event": 70,
+    "introduction": 51,
+    "general": 337,
+    "program": 71,
+    "graduate": 28,
+    "department": 91,
+    "research": 65,
+    "admission": 10
+  },
+  "corpus_type_distribution": {
+    "news": 70,
+    "core": 316,
+    "general": 337
+  },
+  "top_titles_by_count": [
+    {
+      "title": "Khoa Công nghệ Thông tin",
+      "count": 135
+    },
+    {
+      "title": "Final_25_06_HieuChinh_K23_CT%C4%90T_ATTT_150TC_23_24.pdf",
+      "count": 95
+    },
+    {
+      "title": "Final_25_05_HieuChinh_K23___CTDT_CNTT_150TC_23_24_.pdf",
+      "count": 91
+    },
+    {
+      "title": "Final_25_06_HieuChinh_K23_CTDT_KTDL_150HC_23_24.pdf",
+      "count": 87
+    },
+    {
+      "title": "Final_HieuChinh_ Chuong trinh dao tao nganh CNTT - He Viet Nhat.pdf",
+      "count": 63
+    },
+    {
+      "title": "K.%20CNTT%20-%20KMT_huong%20UD%20%28Edited%209-2023%29.pdf",
+      "count": 50
+    },
+    {
+      "title": "2021_CTDT_CNTT_150TC.docx",
+      "count": 45
+    },
+    {
+      "title": "K. CNTT - KMT_ huong NC (Edited 4-2024).docx",
+      "count": 34
+    },
+    {
+      "title": "K19_CTDT_KTDL_150HC_V4_PDT.docx",
+      "count": 33
+    },
+    {
+      "title": "K22_CTĐT_ATTT 150TC_Review_all_3-3-2023.docx",
+      "count": 30
+    },
+    {
+      "title": "Viện sau đại học",
+      "count": 28
+    },
+    {
+      "title": "K19_CTDT_CNTT_150HC_V6.docx",
+      "count": 13
+    },
+    {
+      "title": "K. CNTT - KMT_huong UD (Edited 4-2024).docx",
+      "count": 11
+    },
+    {
+      "title": "Faculty of Information Technology",
+      "count": 5
+    },
+    {
+      "title": "K20_CTDT_KTDL_150HC_V7.docx",
+      "count": 3
+    }
+  ],
+  "sample_core_titles": [
+    "Khoa Công nghệ Thông tin",
+    "Final_25_06_HieuChinh_K23_CT%C4%90T_ATTT_150TC_23_24.pdf",
+    "Final_25_06_HieuChinh_K23_CTDT_KTDL_150HC_23_24.pdf",
+    "K.%20CNTT%20-%20KMT_huong%20UD%20%28Edited%209-2023%29.pdf",
+    "Faculty of Information Technology",
+    "Viện sau đại học",
+    "2021_CTDT_CNTT_150TC.docx",
+    "Final_25_05_HieuChinh_K23___CTDT_CNTT_150TC_23_24_.pdf",
+    "Final_HieuChinh_ Chuong trinh dao tao nganh CNTT - He Viet Nhat.pdf",
+    "K19_CTDT_CNTT_150HC_V6.docx"
+  ],
+  "sample_news_titles": [
+    "Khoa Công nghệ Thông tin",
+    "Final_25_06_HieuChinh_K23_CT%C4%90T_ATTT_150TC_23_24.pdf",
+    "Faculty of Information Technology",
+    "Viện sau đại học",
+    "2021_CTDT_CNTT_150TC.docx",
+    "Final_25_05_HieuChinh_K23___CTDT_CNTT_150TC_23_24_.pdf",
+    "Final_HieuChinh_ Chuong trinh dao tao nganh CNTT - He Viet Nhat.pdf",
+    "K19_CTDT_CNTT_150HC_V6.docx",
+    "K22_CTĐT_ATTT 150TC_Review_all_3-3-2023.docx",
+    "K19_CTDT_KTDL_150HC_V4_PDT.docx"
+  ],
+  "sample_general_titles": [
+    "Khoa Công nghệ Thông tin",
+    "Final_25_06_HieuChinh_K23_CT%C4%90T_ATTT_150TC_23_24.pdf",
+    "Final_25_06_HieuChinh_K23_CTDT_KTDL_150HC_23_24.pdf",
+    "K.%20CNTT%20-%20KMT_huong%20UD%20%28Edited%209-2023%29.pdf",
+    "Faculty of Information Technology",
+    "2021_CTDT_CNTT_150TC.docx",
+    "Final_25_05_HieuChinh_K23___CTDT_CNTT_150TC_23_24_.pdf",
+    "Final_HieuChinh_ Chuong trinh dao tao nganh CNTT - He Viet Nhat.pdf",
+    "K19_CTDT_CNTT_150HC_V6.docx",
+    "K22_CTĐT_ATTT 150TC_Review_all_3-3-2023.docx"
+  ]
+}

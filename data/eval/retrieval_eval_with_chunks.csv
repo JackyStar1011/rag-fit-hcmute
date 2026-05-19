@@ -1,0 +1,59 @@
+﻿question,expected_doc_id,expected_chunk_id,category,difficulty
+Khoa CNTT HCMUTE được thành lập khi nào?,e8d9f617e7a53ef2,e8d9f617e7a53ef2_chunk_0000,introduction,easy
+CNTT HCMUTE thành lập năm nào?,e8d9f617e7a53ef2,e8d9f617e7a53ef2_chunk_0000,introduction,medium
+Khoa mình mở từ bao giờ?,e8d9f617e7a53ef2,e8d9f617e7a53ef2_chunk_0000,introduction,hard
+Giới thiệu về Khoa CNTT HCMUTE,e8d9f617e7a53ef2,e8d9f617e7a53ef2_chunk_0000,introduction,easy
+Khoa CNTT thuộc trường nào?,e8d9f617e7a53ef2,e8d9f617e7a53ef2_chunk_0000,introduction,medium
+Lịch sử phát triển của khoa CNTT?,e8d9f617e7a53ef2,e8d9f617e7a53ef2_chunk_0000,introduction,medium
+Khoa CNTT có lịch sử ra sao?,e8d9f617e7a53ef2,e8d9f617e7a53ef2_chunk_0000,introduction,hard
+Thông tin tổng quan về khoa CNTT,e8d9f617e7a53ef2,e8d9f617e7a53ef2_chunk_0000,introduction,easy
+Khoa CNTT HCMUTE là gì?,e8d9f617e7a53ef2,e8d9f617e7a53ef2_chunk_0000,introduction,medium
+Cho mình info về khoa CNTT,e8d9f617e7a53ef2,e8d9f617e7a53ef2_chunk_0000,introduction,hard
+Khoa CNTT có những chương trình đào tạo nào?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0003,program,easy
+Ngành Công nghệ thông tin có mã ngành gì?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0002,program,easy
+CNTT học những gì?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0000,program,medium
+Chương trình đào tạo ngành CNTT gồm gì?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0003,program,easy
+Ngành IT học môn gì?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0003,program,hard
+Học CNTT ở đây có gì?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0000,program,medium
+Thông tin ngành Công nghệ thông tin?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0000,program,easy
+Ngành CNTT đào tạo gì?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0003,program,medium
+CNTT ở trường này học cái gì?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0000,program,hard
+Chương trình CNTT như thế nào?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0003,program,medium
+Ngành An toàn thông tin học về gì?,a139dd193ef42bbd,a139dd193ef42bbd_chunk_0003,program,easy
+ATTT học gì?,a139dd193ef42bbd,a139dd193ef42bbd_chunk_0003,program,medium
+Chương trình ngành An toàn thông tin?,a139dd193ef42bbd,a139dd193ef42bbd_chunk_0003,program,easy
+Học ATTT có gì?,a139dd193ef42bbd,a139dd193ef42bbd_chunk_0003,program,hard
+Học cao học CNTT ở đây có không?,6d0b73a7d3321310,6d0b73a7d3321310_chunk_0001,graduate,easy
+Thông tin đào tạo sau đại học CNTT?,6d0b73a7d3321310,6d0b73a7d3321310_chunk_0000,graduate,medium
+Có chương trình graduate không?,6d0b73a7d3321310,6d0b73a7d3321310_chunk_0000,graduate,hard
+Cao học ngành CNTT như thế nào?,6d0b73a7d3321310,6d0b73a7d3321310_chunk_0001,graduate,medium
+Trang chủ khoa CNTT có gì?,1f11eb62d4b56a75,1f11eb62d4b56a75_chunk_0004,general,easy
+Thông tin chung khoa CNTT?,1f11eb62d4b56a75,1f11eb62d4b56a75_chunk_0003,general,medium
+Chương trình CNTT như thế nào?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0003,program,medium
+Ngành IT của trường học gì?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0002,program,hard
+Mã ngành CNTT là bao nhiêu?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0002,program,easy
+Thông tin chương trình IT?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0003,program,hard
+Sinh viên CNTT học gì?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0002,program,medium
+Ngành Công nghệ thông tin đào tạo những gì?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0003,program,easy
+Học ngành CNTT ra sao?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0000,program,hard
+Nội dung đào tạo CNTT?,6a3920adeb29eba8,6a3920adeb29eba8_chunk_0003,program,medium
+ATTT học những môn gì?,a139dd193ef42bbd,a139dd193ef42bbd_chunk_0003,program,medium
+An toàn thông tin đào tạo gì?,a139dd193ef42bbd,a139dd193ef42bbd_chunk_0003,program,easy
+Học ngành ATTT có gì?,a139dd193ef42bbd,a139dd193ef42bbd_chunk_0003,program,hard
+Chương trình đào tạo ATTT?,a139dd193ef42bbd,a139dd193ef42bbd_chunk_0003,program,easy
+ATTT của trường học gì?,a139dd193ef42bbd,a139dd193ef42bbd_chunk_0003,program,medium
+Kỹ thuật dữ liệu học gì?,0948421908dede34,0948421908dede34_chunk_0003,program,easy
+Ngành KTDL đào tạo gì?,0948421908dede34,0948421908dede34_chunk_0003,program,medium
+Data engineering học gì?,0948421908dede34,0948421908dede34_chunk_0001,program,hard
+Chương trình ngành Kỹ thuật dữ liệu?,0948421908dede34,0948421908dede34_chunk_0003,program,easy
+KTDL có học gì đặc biệt?,0948421908dede34,0948421908dede34_chunk_0003,program,hard
+Đào tạo sau đại học CNTT?,6d0b73a7d3321310,6d0b73a7d3321310_chunk_0002,graduate,easy
+Có học master CNTT không?,6d0b73a7d3321310,6d0b73a7d3321310_chunk_0001,graduate,hard
+Thông tin graduate program CNTT?,6d0b73a7d3321310,6d0b73a7d3321310_chunk_0000,graduate,hard
+Chương trình cao học CNTT?,6d0b73a7d3321310,6d0b73a7d3321310_chunk_0001,graduate,medium
+Học sau đại học IT ở đây được không?,6d0b73a7d3321310,6d0b73a7d3321310_chunk_0002,graduate,hard
+Homepage khoa CNTT có gì?,1f11eb62d4b56a75,1f11eb62d4b56a75_chunk_0003,general,easy
+Tin tức khoa CNTT?,1f11eb62d4b56a75,1f11eb62d4b56a75_chunk_0003,general,medium
+Thông tin chung về homepage khoa?,1f11eb62d4b56a75,1f11eb62d4b56a75_chunk_0006,general,medium
+Khoa CNTT có thông báo gì?,1f11eb62d4b56a75,1f11eb62d4b56a75_chunk_0004,general,hard
+Website khoa CNTT có gì?,1f11eb62d4b56a75,1f11eb62d4b56a75_chunk_0003,general,easy

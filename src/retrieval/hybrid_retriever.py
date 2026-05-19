@@ -1,214 +1,240 @@
-import pickle
-import re
-from collections import defaultdict
-
-import faiss
-import numpy as np
-from rank_bm25 import BM25Okapi
-from sentence_transformers import SentenceTransformer
-
-from src.config import (
-    EMBEDDING_MODEL_NAME,
-    FAISS_INDEX_PATH,
-    METADATA_PATH,
-)
-
-
-VIETNAMESE_STOPWORDS = {
-    "là", "của", "và", "có", "các", "những", "nào", "gì", "ở", "về",
-    "cho", "trong", "với", "được", "tại", "bao", "nhiêu", "một", "của",
-    "khoa", "hcmute", "fit",
-}
-
-
-def tokenize(text: str) -> list[str]:
-    text = text.lower()
-    tokens = re.findall(r"\w+", text, flags=re.UNICODE)
-    return [
-        token
-        for token in tokens
-        if len(token) > 1 and token not in VIETNAMESE_STOPWORDS
-    ]
+from src.retrieval.dense_retriever import DenseRetriever
+from src.retrieval.bm25_retriever import BM25Retriever
 
 
 class HybridRetriever:
-    def __init__(
-        self,
-        dense_candidate_k: int = 20,
-        bm25_candidate_k: int = 20,
-        rrf_k: int = 60,
-        use_metadata_boost: bool = True,
-    ):
-        self.dense_candidate_k = dense_candidate_k
-        self.bm25_candidate_k = bm25_candidate_k
-        self.rrf_k = rrf_k
-        self.use_metadata_boost = use_metadata_boost
+    def __init__(self):
+        print("Loading Dense retriever...")
+        self.dense_retriever = DenseRetriever()
 
-        print("Loading embedding model...")
-        self.model = SentenceTransformer(
-            EMBEDDING_MODEL_NAME,
-            device="cpu",
-        )
-
-        print("Loading FAISS index...")
-        self.index = faiss.read_index(str(FAISS_INDEX_PATH))
-
-        print("Loading metadata...")
-        with open(METADATA_PATH, "rb") as f:
-            self.metadata = pickle.load(f)
-
-        print("Building BM25 index...")
-        self.bm25_corpus = self._build_bm25_corpus()
-        self.bm25 = BM25Okapi(self.bm25_corpus)
+        print("Loading BM25 retriever...")
+        self.bm25_retriever = BM25Retriever()
 
         print("Hybrid retriever ready!")
 
-    def _build_bm25_corpus(self) -> list[list[str]]:
-        corpus = []
+    def normalize_query(self, query: str) -> str:
+        replacements = {
+            "CNTT": "Công nghệ thông tin",
+            "ATTT": "An toàn thông tin",
+            "IT": "Công nghệ thông tin",
+            "KTDL": "Kỹ thuật dữ liệu",
+            "FIT": "Khoa Công nghệ Thông tin",
+        }
 
-        for item in self.metadata:
-            # Do not overuse title because many pages have the same title:
-            # "Khoa Công nghệ Thông tin"
-            category = item.get("category", "")
-            text = item.get("text", "")
-            bm25_text = f"{category} {text}"
-            corpus.append(tokenize(bm25_text))
+        normalized = query
 
-        return corpus
+        for short, full in replacements.items():
+            normalized = normalized.replace(short, full)
 
-    def _dense_search(self, query: str) -> dict[int, dict]:
-        query_embedding = self.model.encode(
-            [query],
-            normalize_embeddings=True,
-        )
+        return normalized
 
-        query_embedding = np.asarray(query_embedding, dtype="float32")
+    def infer_boost_categories(self, query: str):
+        query_lower = self.normalize_query(query).lower()
 
-        scores, ids = self.index.search(query_embedding, self.dense_candidate_k)
+        if any(
+            keyword in query_lower
+            for keyword in ["thành lập", "giới thiệu", "lịch sử", "tổng quan"]
+        ):
+            return {"introduction", "home", "general"}
 
-        results = {}
-
-        for rank, (score, idx) in enumerate(zip(scores[0], ids[0]), start=1):
-            idx = int(idx)
-            results[idx] = {
-                "dense_rank": rank,
-                "dense_score": float(score),
-            }
-
-        return results
-
-    def _bm25_search(self, query: str) -> dict[int, dict]:
-        query_tokens = tokenize(query)
-
-        if not query_tokens:
-            return {}
-
-        scores = self.bm25.get_scores(query_tokens)
-        top_ids = np.argsort(scores)[::-1][: self.bm25_candidate_k]
-
-        results = {}
-
-        for rank, idx in enumerate(top_ids, start=1):
-            idx = int(idx)
-            score = float(scores[idx])
-
-            if score <= 0:
-                continue
-
-            results[idx] = {
-                "bm25_rank": rank,
-                "bm25_score": score,
-            }
-
-        return results
-
-    def _metadata_boost(self, query: str, item: dict) -> float:
-        if not self.use_metadata_boost:
-            return 0.0
-
-        query_lower = query.lower()
-        category = item.get("category", "")
-
-        boost = 0.0
-
-        is_program_query = any(
+        if any(
             keyword in query_lower
             for keyword in [
-                "ngành",
                 "mã ngành",
                 "chương trình",
                 "đào tạo",
-                "học những gì",
-                "gồm những ngành",
+                "học gì",
+                "môn học",
+                "công nghệ thông tin",
+                "an toàn thông tin",
+                "kỹ thuật dữ liệu",
             ]
-        )
+        ):
+            return {"program", "curriculum", "curriculum_pdf", "general"}
 
-        is_intro_query = any(
+        if any(
             keyword in query_lower
-            for keyword in [
-                "thành lập",
-                "giới thiệu",
-                "bộ môn",
-                "phòng lab",
-            ]
-        )
+            for keyword in ["cao học", "thạc sĩ", "sau đại học", "graduate", "master"]
+        ):
+            return {"graduate", "graduate_pdf"}
 
-        if is_program_query:
-            if category in {"program", "curriculum", "curriculum_pdf", "introduction"}:
-                boost += 0.025
-            if category in {"general", "home"}:
-                boost -= 0.025
+        if any(
+            keyword in query_lower
+            for keyword in ["tin tức", "thông báo", "tuyển dụng", "sự kiện", "việc làm"]
+        ):
+            return {"home", "general"}
 
-        if is_intro_query:
-            if category in {"introduction"}:
-                boost += 0.035
-            if category in {"general", "home"}:
-                boost -= 0.025
+        return set()
+
+    def title_url_boost(self, query: str, item: dict) -> float:
+        query_lower = query.lower()
+        normalized_lower = self.normalize_query(query).lower()
+
+        title = item.get("title", "").lower()
+        url = item.get("url", "").lower()
+        text = item.get("text", "").lower()
+
+        combined_title_url = f"{title} {url}"
+
+        boost = 0.0
+
+        # boost mạnh nếu query hỏi ATTT và title/url có dấu hiệu ATTT
+        if "an toàn thông tin" in normalized_lower:
+            if "attt" in combined_title_url or "an toàn thông tin" in combined_title_url:
+                boost += 0.35
+            elif "an toàn thông tin" in text[:500]:
+                boost += 0.10
+
+        # boost nếu query hỏi CNTT
+        if "công nghệ thông tin" in normalized_lower:
+            if "cntt" in combined_title_url or "công nghệ thông tin" in combined_title_url:
+                boost += 0.25
+
+        # boost nếu query hỏi KTDL
+        if "kỹ thuật dữ liệu" in normalized_lower:
+            if "ktdl" in combined_title_url or "kỹ thuật dữ liệu" in combined_title_url:
+                boost += 0.35
+
+        # boost nếu query hỏi graduate
+        if any(k in normalized_lower for k in ["cao học", "thạc sĩ", "sau đại học", "graduate", "master"]):
+            if "graduate" in combined_title_url or "thạc sĩ" in text[:500] or "cao học" in text[:500]:
+                boost += 0.25
 
         return boost
 
-    def search(self, query: str, top_k: int = 5) -> list[dict]:
-        dense_results = self._dense_search(query)
-        bm25_results = self._bm25_search(query)
+    def category_boost(self, query: str, item: dict) -> float:
+        normalized_query = self.normalize_query(query).lower()
 
-        fused_scores = defaultdict(float)
-        debug_info = defaultdict(dict)
+        category = item.get("category", "")
+        text = item.get("text", "").lower()
+        title = item.get("title", "").lower()
+        url = item.get("url", "").lower()
 
-        for idx, info in dense_results.items():
-            rank = info["dense_rank"]
-            fused_scores[idx] += 1.0 / (self.rrf_k + rank)
-            debug_info[idx].update(info)
+        boost = 0.0
 
-        for idx, info in bm25_results.items():
-            rank = info["bm25_rank"]
-            fused_scores[idx] += 1.0 / (self.rrf_k + rank)
-            debug_info[idx].update(info)
+        # Case đặc biệt: hỏi mã ngành
+        # Ưu tiên tài liệu program/core info, giảm curriculum nếu chỉ dính "mã môn học"
+        if "mã ngành" in normalized_query:
+            if category == "program":
+                boost += 1.20
 
-        for idx in list(fused_scores.keys()):
-            item = self.metadata[idx]
-            fused_scores[idx] += self._metadata_boost(query, item)
+            if "mã ngành" in text[:1000]:
+                boost += 0.80
 
-        ranked_ids = sorted(
-            fused_scores.keys(),
-            key=lambda idx: fused_scores[idx],
+            if "mã ngành" in title or "mã ngành" in url:
+                boost += 0.50
+
+            if category in {"curriculum", "curriculum_pdf"}:
+                boost -= 0.25
+
+            if "mã môn học" in text[:1000]:
+                boost -= 0.25
+
+            return boost
+
+        # Giới thiệu / lịch sử
+        if any(
+            keyword in normalized_query
+            for keyword in ["thành lập", "giới thiệu", "lịch sử", "tổng quan"]
+        ):
+            if category in {"introduction", "home", "general"}:
+                boost += 0.30
+
+        # Chương trình đào tạo / học gì
+        if any(
+            keyword in normalized_query
+            for keyword in [
+                "chương trình",
+                "đào tạo",
+                "học gì",
+                "môn học",
+                "công nghệ thông tin",
+                "an toàn thông tin",
+                "kỹ thuật dữ liệu",
+            ]
+        ):
+            if category in {"program", "curriculum", "curriculum_pdf", "general"}:
+                boost += 0.15
+
+        # Sau đại học
+        if any(
+            keyword in normalized_query
+            for keyword in ["cao học", "thạc sĩ", "sau đại học", "graduate", "master"]
+        ):
+            if category in {"graduate", "graduate_pdf"}:
+                boost += 0.30
+
+        # Tin tức / sự kiện / tuyển dụng
+        if any(
+            keyword in normalized_query
+            for keyword in ["tin tức", "thông báo", "tuyển dụng", "sự kiện", "việc làm"]
+        ):
+            if category in {"home", "general"}:
+                boost += 0.25
+
+        return boost
+
+    def search(self, query: str, top_k: int = 5):
+        dense_results = self.dense_retriever.search(query, top_k=top_k * 10)
+        bm25_results = self.bm25_retriever.search(query, top_k=top_k * 10)
+
+        merged = {}
+
+        # RRF: Reciprocal Rank Fusion
+        rrf_k = 60
+
+        def add_results(results, source_name, weight):
+            for rank, item in enumerate(results, start=1):
+                doc_id = item["doc_id"]
+
+                rrf_score = weight * (1.0 / (rrf_k + rank))
+
+                if doc_id not in merged:
+                    new_item = item.copy()
+                    new_item["dense_score"] = 0.0
+                    new_item["bm25_score"] = 0.0
+                    new_item["hybrid_score"] = 0.0
+                    new_item["retrievers"] = set()
+                    merged[doc_id] = new_item
+
+                merged[doc_id]["hybrid_score"] += rrf_score
+                merged[doc_id]["retrievers"].add(source_name)
+
+                if source_name == "dense":
+                    merged[doc_id]["dense_score"] = max(
+                        merged[doc_id]["dense_score"],
+                        float(item.get("score", 0.0)),
+                    )
+
+                if source_name == "bm25":
+                    merged[doc_id]["bm25_score"] = max(
+                        merged[doc_id]["bm25_score"],
+                        float(item.get("score", 0.0)),
+                    )
+
+        add_results(dense_results, "dense", weight=1.0)
+        add_results(bm25_results, "bm25", weight=1.2)
+
+        final_results = []
+
+        for item in merged.values():
+            boost = 0.0
+            boost += self.category_boost(query, item)
+            boost += self.title_url_boost(query, item)
+
+            item["boost"] = boost
+            item["final_score"] = item["hybrid_score"] * (1.0 + boost)
+            item["retrievers"] = ",".join(sorted(item["retrievers"]))
+
+            final_results.append(item)
+
+        final_results = sorted(
+            final_results,
+            key=lambda x: x["final_score"],
             reverse=True,
         )
 
-        results = []
-
-        for idx in ranked_ids[:top_k]:
-            item = self.metadata[idx].copy()
-
-            item["score"] = float(fused_scores[idx])
-            item["hybrid_score"] = float(fused_scores[idx])
-            item["dense_rank"] = debug_info[idx].get("dense_rank")
-            item["dense_score"] = debug_info[idx].get("dense_score")
-            item["bm25_rank"] = debug_info[idx].get("bm25_rank")
-            item["bm25_score"] = debug_info[idx].get("bm25_score")
-
-            results.append(item)
-
-        return results
+        return final_results[:top_k]
 
 
 if __name__ == "__main__":
@@ -216,10 +242,10 @@ if __name__ == "__main__":
 
     test_queries = [
         "Khoa CNTT HCMUTE thành lập năm nào?",
-        "Tất cả bộ môn của khoa FIT HCMUTE?",
-        "Khoa FIT HCMUTE gồm những ngành nào?",
         "Ngành Công nghệ thông tin có mã ngành gì?",
-        "Ngành An toàn thông tin học về gì?",
+        "ATTT học gì?",
+        "KTDL học gì?",
+        "Học cao học CNTT ở đây có không?",
     ]
 
     for query in test_queries:
@@ -230,10 +256,13 @@ if __name__ == "__main__":
 
         for i, result in enumerate(results, start=1):
             print(f"\nResult {i}")
-            print(f"Hybrid score: {result['hybrid_score']:.4f}")
-            print(f"Dense rank: {result.get('dense_rank')} | Dense score: {result.get('dense_score')}")
-            print(f"BM25 rank: {result.get('bm25_rank')} | BM25 score: {result.get('bm25_score')}")
-            print(f"Title: {result.get('title')}")
-            print(f"Category: {result.get('category')}")
-            print(f"URL: {result.get('url')}")
-            print(f"Text: {result.get('text', '')[:500]}")
+            print(f"Final Score: {result['final_score']:.6f}")
+            print(f"Dense Score: {result['dense_score']:.4f}")
+            print(f"BM25 Score: {result['bm25_score']:.4f}")
+            print(f"Boost: {result['boost']:.2f}")
+            print(f"Retrievers: {result['retrievers']}")
+            print(f"Doc ID: {result['doc_id']}")
+            print(f"Title: {result['title']}")
+            print(f"Category: {result['category']}")
+            print(f"URL: {result['url']}")
+            print(f"Text: {result['text'][:300]}")
