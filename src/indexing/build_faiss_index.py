@@ -8,19 +8,19 @@ from tqdm import tqdm
 
 from src.config import (
     CHUNK_PATH,
+    CORE_FACT_PATH,
     EMBEDDING_MODEL_NAME,
     FAISS_INDEX_PATH,
     METADATA_PATH,
 )
 
+def load_jsonl(path):
+    records = []
 
-def load_chunks() -> list[dict]:
-    if not CHUNK_PATH.exists():
-        raise FileNotFoundError(f"chunk file not found: {CHUNK_PATH}")
+    if not path.exists():
+        return records
 
-    chunks = []
-
-    with CHUNK_PATH.open("r", encoding="utf-8") as f:
+    with path.open("r", encoding="utf-8") as f:
         for line in f:
             if not line.strip():
                 continue
@@ -30,7 +30,17 @@ def load_chunks() -> list[dict]:
             if "text" not in item or not item["text"].strip():
                 continue
 
-            chunks.append(item)
+            records.append(item)
+
+    return records
+
+
+def load_chunks() -> list[dict]:
+    chunks = []
+
+    # Put core facts first so they are always included in metadata/index.
+    chunks.extend(load_jsonl(CORE_FACT_PATH))
+    chunks.extend(load_jsonl(CHUNK_PATH))
 
     if not chunks:
         raise ValueError("no valid chunks found")

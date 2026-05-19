@@ -8,9 +8,8 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT_DIR))
 
 from src.generation.llm_generator import LocalLLMGenerator
-from src.generation.prompt_builder import build_rag_prompt
-from src.retrieval.dense_retriever import DenseRetriever
-from src.generation.citation_validator import validate_or_fallback
+from src.generation.rag_pipeline import answer_question
+from src.retrieval.hybrid_retriever import HybridRetriever
 
 
 st.set_page_config(
@@ -77,7 +76,7 @@ def render_rag_details(
         st.write(
             {
                 "top_k": top_k,
-                "retriever": "FAISS dense retrieval",
+                "retriever": "Hybrid retrieval: FAISS dense + BM25 + RRF",
                 "embedding_model": "AITeamVN/Vietnamese_Embedding",
                 "generator": "Qwen2.5 local generator",
             }
@@ -106,7 +105,7 @@ def render_rag_details(
 
 @st.cache_resource(show_spinner=False)
 def load_retriever():
-    return DenseRetriever()
+    return HybridRetriever()
 
 
 @st.cache_resource(show_spinner=False)
@@ -147,21 +146,24 @@ if ask_clicked and question:
 
     try:
         with st.spinner("Đang tìm kiếm tài liệu liên quan và tạo câu trả lời..."):
-            processing_logs.append("Loaded dense retriever.")
+            processing_logs.append("Loaded retriever.")
             retriever = load_retriever()
-
-            processing_logs.append(f"Retrieved top-{top_k} relevant chunks.")
-            results = retriever.search(question, top_k=top_k)
-
-            processing_logs.append("Built grounded RAG prompt.")
-            prompt = build_rag_prompt(question, results)
 
             processing_logs.append("Loaded local Qwen generator.")
             generator = load_generator()
 
-            processing_logs.append("Generated final answer.")
-            answer = generator.generate(prompt)
-            answer = validate_or_fallback(answer,max_source_id=len(results))
+            processing_logs.append(
+                f"Ran RAG pipeline with top-{top_k} retrieved chunks."
+            )
+            response = answer_question(
+                question=question,
+                retriever=retriever,
+                generator=generator,
+                top_k=top_k,
+            )
+            answer = response["answer"]
+            results = response["retrieved_chunks"]
+            prompt = response["prompt"]
 
         st.markdown(answer)
         render_answer_sources(answer, results)

@@ -1,7 +1,7 @@
 import re
 
 
-FALLBACK_ANSWER = "Tôi chưa có đủ thông tin trong tài liệu được cung cấp để trả lời câu hỏi này."
+FALLBACK_ANSWER = "Không tìm thấy thông tin trong tài liệu được cung cấp."
 
 
 def extract_citations(answer: str) -> list[int]:
@@ -10,6 +10,9 @@ def extract_citations(answer: str) -> list[int]:
 
 
 def has_valid_citation(answer: str, max_source_id: int) -> bool:
+    if max_source_id <= 0:
+        return False
+
     citations = extract_citations(answer)
 
     if not citations:
@@ -26,9 +29,6 @@ def validate_or_fallback(answer: str, max_source_id: int) -> str:
         return FALLBACK_ANSWER
 
     if not has_valid_citation(answer, max_source_id):
-        return (
-            answer.strip()
-            + "\n\nLưu ý: Câu trả lời này chưa có citation hợp lệ, cần kiểm tra lại nguồn."
-        )
+        return FALLBACK_ANSWER
 
     return answer.strip()

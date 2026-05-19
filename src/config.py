@@ -13,6 +13,8 @@ METADATA_PATH = INDEX_DIR / "metadata.pkl"
 
 EMBEDDING_MODEL_NAME = "AITeamVN/Vietnamese_Embedding"
 
+CORE_FACT_PATH = ROOT_DIR / "data" / "chunks" / "core_facts.jsonl"
+
 # generator model for RAG answer generation
 GENERATOR_MODEL_NAME = os.getenv(
     "GENERATOR_MODEL_NAME",
